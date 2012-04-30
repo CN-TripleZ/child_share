@@ -39,6 +39,7 @@ public class UserServlet extends HttpServlet {
 		} else if ("query".equals(cmd)) {
 			String id = request.getParameter("id");
 			String password = request.getParameter("password");
+			response.setCharacterEncoding("UTF-8");
 			PrintWriter writer = response.getWriter();
 			if (id == null || "".equals(id) || password == null || "".equals(password)) {
 				writer.write("user id and password error!");

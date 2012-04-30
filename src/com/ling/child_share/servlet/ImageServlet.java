@@ -38,6 +38,7 @@ public class ImageServlet extends HttpServlet {
 			
 		} else if ("query".equals(cmd)) {
 			String userId = request.getParameter("userId");
+			response.setCharacterEncoding("UTF-8");
 			PrintWriter writer = response.getWriter();
 			if (userId == null || "".equals(userId)) {
 				writer.write("user id error!");
