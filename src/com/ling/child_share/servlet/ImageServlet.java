@@ -46,14 +46,14 @@ public class ImageServlet extends HttpServlet {
 			}
 			ResultSet rs = imageDao.getImages(userId);
 			try {
-				String html = "getInfo(";
+				String html = "getInfo([";
 				while (rs.next()) {
-					html += "{descript:'" + rs.getString("description") + "', path:'" + rs.getString("img_path") + "'}";
-					if (!rs.last()) {
+					html += "{description:'" + rs.getString("description") + "', path:'" + rs.getString("img_path") + "', upload_time:'" + rs.getDate("upload_time") + "'}";
+					if (!rs.isLast()) {
 						html += ",";
 					}
 				}
-				html += ");";
+				html += "]);";
 				writer.write(html);
 			} catch (SQLException e) {
 				e.printStackTrace();
