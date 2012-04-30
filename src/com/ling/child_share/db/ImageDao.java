@@ -23,7 +23,7 @@ public class ImageDao {
 	}
 	
 	public boolean addImage(String userId) {
-		String sql = "insert into t_image (t_user_id, description, upload_time, img_path) values('haiyuchen', '你的成长将是妈妈最大的快乐', '2012-02-02', '/img_patch')";
+		String sql = "insert into t_image (t_user_id, description, upload_time, img_path) values('" + userId + "', '你的成长将是妈妈最大的快乐', '2012-02-02', 'http://www.iteye.com/upload/logo/user/664205/9e2aff5c-bb85-3662-a5ef-0fd9338d097a.png?1334153356')";
 		DbOperator dbOperator = new DbOperator();
 		PreparedStatement ps = dbOperator.getPreparedStatement(sql);
 		try {
@@ -34,5 +34,10 @@ public class ImageDao {
 		}
 		dbOperator.close();
 		return true;
+	}
+	
+	public static void main(String[] args) {
+		ImageDao imageDao = new ImageDao();
+		imageDao.addImage("haiyuchen");
 	}
 }
