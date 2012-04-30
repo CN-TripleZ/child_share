@@ -1,0 +1,11 @@
+增加用户，目前是默认从UserDao里添加一个写死的数据，后续抽象出来一个User类，并接收参数，加密处理，暂时先跑起来
+http://localhost:8080/child_share/UserServlet?cmd=add
+
+查找用户信息，传入相应的id和password，后续抽取成一个User类，并接收参数，加密处理，暂时先跑起来
+http://localhost:8080/child_share/UserServlet?cmd=query&id=haiyuchen&password=123456
+
+增加一个相片，目前是默认从ImageDao里添加一个写死的数据，后续抽象出来一个Image类，并发收参数
+http://localhost:8080/child_share/ImageServlet?cmd=add
+
+查找与用户相关的图片信息，传入userId，查找出所有的image信息
+http://localhost:8080/child_share/ImageServlet?cmd=query&userId=haiyuchen
