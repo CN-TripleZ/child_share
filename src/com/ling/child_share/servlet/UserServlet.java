@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.ling.child_share.db.UserDao;
+import com.ling.child_share.model.User;
 
 /**
  * Servlet implementation class UserServlet
@@ -32,15 +33,25 @@ public class UserServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String cmd = request.getParameter("cmd");
 		UserDao userDao = new UserDao();
+		PrintWriter writer = response.getWriter();
 		if ("add".equals(cmd)) {
-			userDao.addUser();
+			User user = new User();
+			String id = request.getParameter("id");
+			String name = request.getParameter("name");
+			String password = request.getParameter("password");
+			String email = request.getParameter("email");
+			user.setId(id);
+			user.setName(name);
+			user.setPassword(password);
+			user.setEmail(email);
+			userDao.addUser(user);
+			writer.write("addUserInfo({id:'" + id + "',name:'" + name + "'});");
 		} else if ("delete".equals(cmd)) {
 			
 		} else if ("query".equals(cmd)) {
 			String id = request.getParameter("id");
 			String password = request.getParameter("password");
 			response.setCharacterEncoding("UTF-8");
-			PrintWriter writer = response.getWriter();
 			if (id == null || "".equals(id) || password == null || "".equals(password)) {
 				writer.write("user id and password error!");
 				return;
@@ -52,6 +63,8 @@ public class UserServlet extends HttpServlet {
 					writer.write("getUserInfo({id:'" + id + "',name:'" + name + "'});");
 					rs.close();
 					return;
+				} else {
+					writer.write("getUserInfo({ret:-1});");
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();

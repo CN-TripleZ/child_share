@@ -4,6 +4,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import com.ling.child_share.model.User;
+
 
 /**
  * @author chenhaiyu e-mail:haiyupeter@163.com
@@ -24,8 +26,12 @@ public class UserDao {
 		return null;
 	}
 	
-	public boolean addUser() {
-		String sql = "insert into t_user values('haiyuchen', '123456', '海宇', '21haiyu21@163.com')";
+	public boolean addUser(User user) {
+		String id = user.getId();
+		String password = user.getPassword();
+		String name = user.getName();
+		String email = user.getEmail();
+		String sql = "insert into t_user values('" + id + "', '" + password + "', '" + name + "', '" + email + "')";
 		DbOperator dbOperator = new DbOperator();
 		PreparedStatement ps = dbOperator.getPreparedStatement(sql);
 		try {
