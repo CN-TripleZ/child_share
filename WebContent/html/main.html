@@ -1,0 +1,119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>首页</title>
+	<link rel="stylesheet" href="../css/jquery.mobile-1.1.0.css" />
+	<script type="text/javascript" src="../js/cordova-1.7.0rc1.js"></script>
+	<script type="text/javascript" src="../js/jquery-1.7.2.js"></script>
+	<script type="text/javascript" src="../js/jquery.mobile-1.1.0.js"></script>
+	<script type="text/javascript">
+		var pictureSource,destinationType;
+		function init() {
+    		document.addEventListener("deviceready", onDeviceReady, true);
+    		showList();
+		}
+		var onDeviceReady = function() {
+			pictureSource=navigator.camera.PictureSourceType;  
+        	destinationType=navigator.camera.DestinationType;  
+		}
+		
+		function getInfo(data) {
+			var listHtml = [];
+			for (var i = 0; i < data.length; i++) {
+				var itemHtml = "";
+				var desc = data[i].description;
+				var src = data[i].path;
+				var upload_time = data[i].upload_time;
+				if ( i % 2 == 0) {
+					itemHtml = '<div class="item_even"><ul><li><img src="' + src + '"></img></li><li class="text">' + upload_time + '<br/>' + desc + '</li></ul></div>';
+				} else {
+		    		itemHtml = '<div class="item_odd"><ul><li class="text">' + upload_time + '<br/>' + desc + '</li><li><img src="' + src + '"></img></li></ul></div>';
+				}
+			    listHtml.push(itemHtml);
+			}
+			$(".list").html(listHtml.join(''));
+		}
+		
+		var showList = function() {
+			$.getScript("http://haiyupeter.gicp.net:8080/child_share/ImageServlet?cmd=query&userId=haiyuchen").error(function(){
+				$(".list").html("服务器繁忙，请稍后重试！");
+			});
+		}
+		
+		var capturePhoto = function() {
+			//navigator.camera.getPicture(onPhotoDataSuccess, onFail, { quality: 50 });  
+			navigator.camera.getPicture(onPhotoURISuccess, onFail, { quality: 50, destinationType: Camera.DestinationType.FILE_URI });
+		}
+		function onPhotoURISuccess(imageURI) {  
+    		var image = document.getElementById('photo');  
+			image.style.display = 'block'; 
+    		image.src = imageURI;  
+		}  
+		var onPhotoDataSuccess = function(imageData) {  
+	        var image = document.getElementById('photo');  
+	        image.style.display = 'block';  
+	        image.src = "data:image/jpeg;base64," + imageData;  
+    	}
+		var onFail = function(message) {
+			alert('Failed because: ' + message); 
+		}  
+	</script>
+	<style type="text/css">
+	    body {
+	        padding:0px;
+	        margin: 0px;
+	        font-family: "微软雅黑";
+			font-size: 12px;
+	    }
+	    .list div {
+	        width: 300px;
+	        height: 210px;
+	    }
+	    .list div ul {
+	        width: 300px;
+	        height: 200px;
+	        padding: 0px;
+	        margin-top: 3px;        
+	    }
+	    .list div ul li{
+	        list-style-type: none;
+	        float: left;
+	    }
+	    .list div ul li.text{
+	        width: 92px;
+	        border-left:4px solid #3ddfdf;
+	        margin-left: 2px;
+	    }
+	    .list img {
+	        width: 200px;
+	    }
+	</style>
+	
+</head>
+<body onload="init();">
+<div data-role="page">
+
+	<div data-role="header" data-theme="b">
+		<h1>亲子卷轴</h1>
+	</div><!-- /header -->
+
+	<div data-role="content" data-theme="b">	
+		<img style="display:none;width:100;height:100px;" id="photo" src="" /> 
+		<div class="list"></div> 
+		<div id="log"></div>
+	</div><!-- /content -->
+	<div data-role="footer" data-theme="b">
+		<div data-role="navbar">
+			<ul>
+				<li><a href="#" onclick="showList();" class="ui-btn-active">首页</a></li>
+				<li><a href="#">热门</a></li>
+				<li><a href="#" onclick="capturePhoto()">拍照</a></li>
+				<li><a href="#">消息</a></li>
+				<li><a href="#">个人</a></li>
+			</ul>
+		</div><!-- /navbar -->
+	</div><!-- /footer -->
+</div><!-- /page -->
+</body>
+</html>
