@@ -3,6 +3,9 @@ package com.ling.child_share.db;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+
+import com.ling.child_share.model.Image;
 
 /**
  * @author chenhaiyu e-mail:haiyupeter@163.com
@@ -22,10 +25,19 @@ public class ImageDao {
 		return null;
 	}
 	
-	public boolean addImage(String userId) {
-		String sql = "insert into t_image (t_user_id, description, upload_time, img_path) values('" + userId + "', '你的成长将是妈妈最大的快乐', '2012-02-02', 'http://www.iteye.com/upload/logo/user/664205/9e2aff5c-bb85-3662-a5ef-0fd9338d097a.png?1334153356')";
+	public boolean addImage(Image image) {
+		StringBuffer sql = new StringBuffer();
+		sql.append("insert into t_image (t_user_id, description, upload_time, img_path) ");
+		sql.append(" values (");
+		sql.append("'").append(image.getUser().getId()).append("',");
+		sql.append("'").append(image.getDescription()).append("',");
+		
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
+		sql.append("'").append(df.format(image.getUpload_time())).append("',");
+		sql.append("'").append(image.getImg_path()).append("'");
+		sql.append(")");
 		DbOperator dbOperator = new DbOperator();
-		PreparedStatement ps = dbOperator.getPreparedStatement(sql);
+		PreparedStatement ps = dbOperator.getPreparedStatement(sql.toString());
 		try {
 			ps.execute();
 		} catch (SQLException e) {
@@ -37,7 +49,6 @@ public class ImageDao {
 	}
 	
 	public static void main(String[] args) {
-		ImageDao imageDao = new ImageDao();
-		imageDao.addImage("haiyuchen");
+
 	}
 }

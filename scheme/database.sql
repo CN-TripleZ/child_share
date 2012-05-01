@@ -22,7 +22,7 @@ t_user_setting(
 */
 create table t_image(
   id int primary key auto_increment,
-  upload_time Date,
+  upload_time TIMESTAMP,
   t_user_id varchar(20),
   description varchar(2000),
   img_path varchar(256)
