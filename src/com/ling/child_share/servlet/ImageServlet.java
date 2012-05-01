@@ -1,18 +1,28 @@
 package com.ling.child_share.servlet;
 
-import java.io.DataInputStream;
-import java.io.FileOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+
+import com.ling.child_share.constants.Constants;
 import com.ling.child_share.db.ImageDao;
+import com.ling.child_share.model.Image;
+import com.ling.child_share.model.User;
 
 /**
  * Servlet implementation class ImageServlet
@@ -37,54 +47,11 @@ public class ImageServlet extends HttpServlet {
 		String cmd = request.getParameter("cmd");
 		ImageDao imageDao = new ImageDao();
 		if ("add".equals(cmd)) {
-			int MAX_SIZE = 102400 * 102400;
-
-			DataInputStream in = null;
-			FileOutputStream fileOut = null;
-
-			String contentType = request.getContentType();
-			try {
-				if (contentType.indexOf("multipart/form-data") >= 0) {
-					in = new DataInputStream(request.getInputStream());
-					int formDataLength = request.getContentLength();
-					if (formDataLength > MAX_SIZE) {
-						return;
-					}
-					byte dataBytes[] = new byte[formDataLength];
-					int byteRead = 0;
-					int totalBytesRead = 0;
-					while (totalBytesRead < formDataLength) {
-						byteRead = in.read(dataBytes, totalBytesRead, formDataLength);
-						totalBytesRead += byteRead;
-					}
-					String file = new String(dataBytes);
-					String saveFile = file.substring(file.indexOf("filename=\"") + 10);
-					saveFile = saveFile.substring(0, saveFile.indexOf("\n"));
-					saveFile = saveFile.substring(saveFile.lastIndexOf("\\") + 1, saveFile.indexOf("\""));
-					int lastIndex = contentType.lastIndexOf("=");
-					String boundary = contentType.substring(lastIndex + 1,contentType.length());
-
-					int pos;
-					pos = file.indexOf("filename=\"");
-					pos = file.indexOf("\n", pos) + 1;
-					pos = file.indexOf("\n", pos) + 1;
-					pos = file.indexOf("\n", pos) + 1;
-					int boundaryLocation = file.indexOf(boundary, pos) - 4;
-					// 取得文件数据的开始的位置
-					int startPos = ((file.substring(0, pos)).getBytes()).length;
-					// 取得文件数据的结束的位置
-					int endPos = ((file.substring(0, boundaryLocation)).getBytes()).length;
-
-					// 创建文件的写出类
-					fileOut = new FileOutputStream("C://aa.jpg");
-					// 保存文件的数据
-					fileOut.write(dataBytes, startPos, (endPos - startPos));
-					fileOut.close();
-				} 
-			} catch (Exception ex) {
-				throw new ServletException(ex.getMessage());
+			List photos = uploadPhoto(request);
+			for (Object obj : photos) {
+				Image image = (Image) obj;
+				imageDao.addImage(image);
 			}
-
 		} else if ("delete".equals(cmd)) {
 
 		} else if ("query".equals(cmd)) {
@@ -113,6 +80,42 @@ public class ImageServlet extends HttpServlet {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	private List uploadPhoto(HttpServletRequest request) {
+		List result = new ArrayList();
+		DiskFileItemFactory factory = new DiskFileItemFactory();
+		ServletFileUpload upload = new ServletFileUpload(factory);
+		try {
+		    List items = upload.parseRequest(request);
+		    Iterator itr = items.iterator();
+		    while (itr.hasNext()) {
+		        FileItem item = (FileItem) itr.next();
+		        if (item.isFormField()) {
+//		        	String fieldName = item.getFieldName();
+//		        	String fieldValue = item.getString();
+		        } else {
+		            if (item.getName() != null && !item.getName().equals("")) {
+		            	String userName = "jeffreyzhang";
+		            	String filePath = Constants.PHOTO_PATH + Constants.FILE_SEPARATOR + userName + Constants.FILE_SEPARATOR;
+		            	File f = new File(filePath);
+						if (!f.exists()) f.mkdirs();
+		                File file = new File(filePath + item.getName() + ".jpg");
+		                item.write(file);
+		                
+		                Image image = new Image();
+			        	image.setT_user(new User("123"));
+			        	image.setUpload_time(new Date());
+			        	image.setDescription("");
+			        	image.setImg_path(file.getPath());
+			        	result.add(image);
+		            }
+		        }
+		    }
+		} catch (Exception e) {
+		    e.printStackTrace();
+		}
+		return result;
 	}
 
 	/**
