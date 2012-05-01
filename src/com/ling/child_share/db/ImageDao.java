@@ -29,7 +29,7 @@ public class ImageDao {
 		StringBuffer sql = new StringBuffer();
 		sql.append("insert into t_image (t_user_id, description, upload_time, img_path) ");
 		sql.append(" values (");
-		sql.append("'").append(image.getT_user().getId()).append("',");
+		sql.append("'").append(image.getUser().getId()).append("',");
 		sql.append("'").append(image.getDescription()).append("',");
 		
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 

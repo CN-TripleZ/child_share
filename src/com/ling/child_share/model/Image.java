@@ -6,7 +6,7 @@ public class Image implements java.io.Serializable {
 	
 	private String id;
 	private Date upload_time;
-	private User t_user;
+	private User user;
 	private String description;
 	private String img_path;
 
@@ -30,12 +30,15 @@ public class Image implements java.io.Serializable {
 	public void setUpload_time(Date uploadTime) {
 		upload_time = uploadTime;
 	}
-	public User getT_user() {
-		return t_user;
+
+	public User getUser() {
+		return user;
 	}
-	public void setT_user(User tUser) {
-		t_user = tUser;
+
+	public void setUser(User user) {
+		this.user = user;
 	}
+
 	public String getDescription() {
 		return description;
 	}

@@ -104,7 +104,7 @@ public class ImageServlet extends HttpServlet {
 		                item.write(file);
 		                
 		                Image image = new Image();
-			        	image.setT_user(new User("123"));
+			        	image.setUser(new User("123"));
 			        	image.setUpload_time(new Date());
 			        	image.setDescription("");
 			        	image.setImg_path(file.getPath());
