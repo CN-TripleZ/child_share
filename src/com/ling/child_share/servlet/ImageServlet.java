@@ -57,6 +57,7 @@ public class ImageServlet extends HttpServlet {
 
 		} else if ("query".equals(cmd)) {
 			String userId = request.getParameter("userId");
+			response.setCharacterEncoding("UTF-8");
 			PrintWriter writer = response.getWriter();
 			if (userId == null || "".equals(userId)) {
 				writer.write("getPhotos({ret:-1, msg:'user not exist'});");
@@ -82,6 +83,7 @@ public class ImageServlet extends HttpServlet {
 				writer.write("getPhotos({ret:-3, msg:'server error'});");
 			}
 		} else if ("hot".equals(cmd)) {
+			response.setCharacterEncoding("UTF-8");
 			PrintWriter writer = response.getWriter();
 			ResultSet rs = imageDao.getHotImages();
 			ArrayList<String> users = new ArrayList<String>();
