@@ -91,32 +91,38 @@ public class ImageServlet extends HttpServlet {
 		try {
 		    List items = upload.parseRequest(request);
 		    Iterator itr = items.iterator();
+		    FileItem fileItem = null;
+		    String userId = "";
+		    String description = "";
+		    String url = "";
 		    while (itr.hasNext()) {
 		        FileItem item = (FileItem) itr.next();
 		        String name = item.getName();
 		        if (item.isFormField()) {
-//		        	String fieldName = item.getFieldName();
-//		        	String fieldValue = item.getString();
-		        } else {
-		            if (item.getName() != null && !item.getName().equals("")) {
-		            	String userId = request.getParameter("userId");
-		            	String description = request.getParameter("description");
-		            	String filePath = request.getSession().getServletContext().getRealPath("/") + "pics" + File.separator + userId + File.separator;
-		            	File f = new File(filePath);
-						if (!f.exists()) f.mkdirs();
-		                File file = new File(filePath + item.getName() + ".jpg");
-		                String url = Constants.PHOTO_PATH_DOMAIN + "child_share/" + "pics" + File.separator + userId + File.separator + item.getName() + ".jpg";
-		                item.write(file);
-		                
-		                Image image = new Image();
-			        	image.setUser(new User(userId));
-			        	image.setUpload_time(new Date());
-			        	image.setDescription(description);
-			        	image.setImg_path(url);
-			        	result.add(image);
-		            }
+		        	
+		        	String fieldName = item.getFieldName();
+		        	String fieldValue = item.getString();
+		        	if ("description".equals(fieldName)) {
+		        		description = fieldValue;
+		        	}
+		        	if ("userId".equals(fieldName)) {
+		        		userId = fieldValue;
+		        	}
+		        } else if (item.getName() != null && !"".equals(item.getName())) {
+	            	String filePath = request.getSession().getServletContext().getRealPath("/") + "pics" + File.separator + userId + File.separator;
+	            	File f = new File(filePath);
+					if (!f.exists()) f.mkdirs();
+	                File file = new File(filePath + item.getName() + ".jpg");
+	                url = Constants.PHOTO_PATH_DOMAIN + "child_share/" + "pics" + File.separator + userId + File.separator + item.getName() + ".jpg";
+	                item.write(file);
 		        }
 		    }
+		    Image image = new Image();
+		    image.setUser(new User(userId));
+		    image.setUpload_time(new Date());
+		    image.setDescription(description);
+		    image.setImg_path(url);
+		    result.add(image);
 		} catch (Exception e) {
 		    e.printStackTrace();
 		}
