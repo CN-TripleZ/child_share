@@ -16,7 +16,7 @@ public class DbOperator {
 
     Connection conn = null;
 
-    String url = "jdbc:mysql://localhost:3306/timeshare";
+    String url = "jdbc:mysql://localhost:3306/timeshare?useUnicode=true&characterEncoding=UTF8";
     String driver = "com.mysql.jdbc.Driver";
     String user = "root";
     String password = "root";
