@@ -38,10 +38,14 @@ public class UserServlet extends HttpServlet {
 			User user = new User();
 			String id = request.getParameter("id");
 			String name = request.getParameter("name");
+			String encodeName = name;
+			if (encodeName != null && !"".equals(encodeName)) {
+				encodeName = new String(encodeName.getBytes("iso-8859-1"), "UTF-8");
+			}
 			String password = request.getParameter("password");
 			String email = request.getParameter("email");
 			user.setId(id);
-			user.setName(name);
+			user.setName(encodeName);
 			user.setPassword(password);
 			user.setEmail(email);
 			userDao.addUser(user);
