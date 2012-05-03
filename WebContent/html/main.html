@@ -1,25 +1,91 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>首页</title>
+<meta charset="UTF-8">
+<title>亲子卷轴</title>
 	<link rel="stylesheet" href="../css/jquery.mobile-1.1.0.css" />
+	<script type="text/javascript" src="../js/constants.js"></script>
 	<script type="text/javascript" src="../js/cordova-1.7.0rc1.js"></script>
 	<script type="text/javascript" src="../js/jquery-1.7.2.js"></script>
 	<script type="text/javascript" src="../js/jquery.mobile-1.1.0.js"></script>
 	<script type="text/javascript">
+	
+		/**  
+		* cookie管理对象  
+		*/  
+		CookieUtil={   
+		   /**  
+		    * 设置Cookie  
+		    * @param {string} 设置cookie的名称  
+		    * @param {string} 设置cookie的值  
+		    * @param {object} 其他选项{是一个对象作为参数}  
+		    */      
+		   set   :   function(name,value,option){   
+		      var str=name+"="+escape(value);
+		      if(option){   
+		         if(option.expireDays){//过期日期   
+		            var date=new Date();   
+		            var ms=option.expireDays*24*3600*1000;   
+		            date.setTime(date.getTime()+ms);   
+		            str+="; expires="+date.toGMTString();   
+		         }   
+		         if(option.path)str+="; path="+path; //设置访问路径   
+		         if(option.domain)str+="; domain"+domain; //设置访问主机   
+		         if(option.secure)str+="; true"; //设置安全性   
+		      }   
+		      document.cookie=str;   
+		   },   
+		   /**  
+		    * 获取Cookie  
+		    * @param  {string} cookie的名称  
+		    * @return {string} cookie的值  
+		    */      
+		   get   :   function(name){   
+		      var cookieArray=document.cookie.split("; "); //得到分割的cookie名值对   
+		      for(var i=0;i<cookieArray.length;i++){   
+		         var arr=cookieArray[i].split("="); //将名和值分开   
+		         if(arr[0]==name)   
+		            return unescape(arr[1]); //如果是指定的cookie，则返回它的值   
+		      }   
+		      return "";   
+		   },   
+		   /**  
+		    * 删除Cookie  
+		    * @param  {string} 需要删除的cookie名称  
+		    */      
+		   del : function(){   
+		      this.set(name,"",{expireDays:-1}); //将过期时间设置为过去来删除一个cookie   
+		   }   
+		}; 
+	
+		function serverError() {
+			alert("服务器繁忙，请稍后重试");
+		}
+		
 		var pictureSource,destinationType;
 		function init() {
     		document.addEventListener("deviceready", onDeviceReady, true);
-    		showList();
 		}
 		var onDeviceReady = function() {
 			pictureSource=navigator.camera.PictureSourceType;  
         	destinationType=navigator.camera.DestinationType;  
 		}
 		
-		function getInfo(data) {
+		function getPhotos(result) {
+			if (result.ret === -1) {
+				alert("用户不存在");
+				return;
+			}
+			if (result.ret != 0) {
+				serverError();
+				return;
+			}
 			var listHtml = [];
+			var data = result.data;
+			if (data.length == 0) {
+				$("#list").html("暂时没有数据，上传照片？<a href='#photo'>上传<a>");
+				return;				
+			}
 			for (var i = 0; i < data.length; i++) {
 				var itemHtml = "";
 				var desc = data[i].description;
@@ -32,23 +98,29 @@
 				}
 			    listHtml.push(itemHtml);
 			}
-			$(".list").html(listHtml.join(''));
+			$("#list").html(listHtml.join(''));
 		}
 		
 		var showList = function() {
-			$.getScript("http://haiyupeter.gicp.net:8080/child_share/ImageServlet?cmd=query&userId=haiyuchen").error(function(){
-				$(".list").html("服务器繁忙，请稍后重试！");
+			$("#content div").hide();
+			$("#list").show();
+			var userId = CookieUtil.get("userid");
+			$.getScript(webContext + "/ImageServlet?cmd=query&userId=" + userId).error(function(){
+				$("#list").html("服务器繁忙，请稍后重试！");
 			});
 		}
 		
-		var capturePhoto = function() {
-			//navigator.camera.getPicture(onPhotoDataSuccess, onFail, { quality: 50 });  
-			navigator.camera.getPicture(onPhotoURISuccess, onFail, { quality: 50, destinationType: Camera.DestinationType.FILE_URI });
+		var capturePhoto = function() { 
+			navigator.camera.getPicture(onPhotoURISuccess, onFail, { quality: 50, destinationType: destinationType.FILE_URI });
 		}
+		var selectPic = function() {
+			navigator.camera.getPicture(onPhotoURISuccess, onFail, { quality: 50,  destinationType: destinationType.FILE_URI, sourceType: pictureSource.PHOTOLIBRARY });
+		}		
 		function onPhotoURISuccess(imageURI) {  
-    		var image = document.getElementById('photo');  
-			image.style.display = 'block'; 
-    		image.src = imageURI;  
+			window.location.hash="#upload";
+    		var photoDiv = $('#photoDiv');  
+			$("#photoPath").val(imageURI);
+			$("#photoImg").attr('src',imageURI);
 		}  
 		var onPhotoDataSuccess = function(imageData) {  
 	        var image = document.getElementById('photo');  
@@ -56,8 +128,96 @@
 	        image.src = "data:image/jpeg;base64," + imageData;  
     	}
 		var onFail = function(message) {
-			alert('Failed because: ' + message); 
+			console.error("An error has occurred while capture one photo. [ " + message + "]");
 		}  
+        function uploadPhoto(){
+			var imageURI = $("#photoPath").val();
+            var options = new FileUploadOptions();
+            options.fileKey = "file";
+            options.fileName = imageURI.substr(imageURI.lastIndexOf('/') + 1);
+            options.mimeType = "image/jpeg";
+			options.chunkedMode = false;
+            var params = new Object();
+            params.value1 = "photo";
+            params.value2 = "描述";
+            
+            options.params = params;
+            
+            var ft = new FileTransfer();
+            var userId = CookieUtil.get('userid');
+            var description = $("#description").val();
+            ft.upload(imageURI, webContext + "/ImageServlet?cmd=add&userId=" + userId + "&description=" + description, onPhotoUploadSuccess, onPhotoUploadFail, options);
+        }
+        var onPhotoUploadSuccess = function(r){
+            console.log("Code = " + r.responseCode);
+            console.log("Response = " + r.response);
+            console.log("Sent = " + r.bytesSent);
+        }
+        var onPhotoUploadFail = function(error){
+            console.error("An error has occurred while photo upload. The error code = " + error.code);
+        }
+        
+        
+        var backToLogin = function() {
+			window.location.hash="#login";
+		}
+        var backToRegister = function() {
+			window.location.hash="#register";
+		}
+        // -------------------------------------------------- 登录 --------------------------------------------------
+        function login() {
+        	var params = {};
+    		params["id"] = $("#id_login").val();
+    		params["password"] = $("#password_login").val();
+    		params["cmd"] = "query";
+    		$.ajax({
+    			url: webContext + "/UserServlet",
+    			data: params,
+    			dataType: 'script'
+			}).error(function(data){
+				alert("服务器繁忙!");
+			});
+        }
+        
+        var getUserInfo = function (result) {
+        	if (result.ret == -9999) {
+        		alert('用户名不存在，或者密码错误！');
+        		return;
+        	}
+        	if (result.ret != 0) {
+        		alert('服务器繁忙，请稍后重试！');
+        	}
+        	if (result.ret == 0) {
+        		var id = result.data.id;
+        		var name = result.data.name;
+        		CookieUtil.set('userid', id);
+        		CookieUtil.set('username', name);
+        		window.location.hash="#main";
+        		showList();
+        	}
+    	}
+        
+        // -------------------------------------------------- 注册 --------------------------------------------------
+        function register(){
+    		var params = {};
+    		params["id"] = $("#id").val();
+    		params["password"] = $("#password").val();
+    		params["passwordConfirm"] = $("#passwordConfirm").val();
+    		params["cmd"] = "add";
+    		params["name"] = $("#name").val();
+    		$.ajax({
+    			url: webContext + "/UserServlet",
+    			data: params,
+    			type: 'post',
+    			dataType: 'script'
+			}).success(function(data){
+			});
+    	}
+    	
+    	var addUserInfo = function(data) {
+			alert(data.id);
+			alert(data.name);    	
+    	}
 	</script>
 	<style type="text/css">
 	    body {
@@ -66,54 +226,192 @@
 	        font-family: "微软雅黑";
 			font-size: 12px;
 	    }
-	    .list div {
+	    .shareList div {
 	        width: 300px;
 	        height: 210px;
 	    }
-	    .list div ul {
+	    .shareList div ul {
 	        width: 300px;
 	        height: 200px;
 	        padding: 0px;
 	        margin-top: 3px;        
 	    }
-	    .list div ul li{
+	    .shareList div ul li{
 	        list-style-type: none;
 	        float: left;
 	    }
-	    .list div ul li.text{
+	    .shareList div ul li.text{
 	        width: 92px;
 	        border-left:4px solid #3ddfdf;
 	        margin-left: 2px;
 	    }
-	    .list img {
+	    .shareList img {
 	        width: 200px;
 	    }
 	</style>
 	
 </head>
 <body onload="init();">
-<div data-role="page">
 
-	<div data-role="header" data-theme="b">
+<!-- 登陆页面开始 -->
+<div data-role="page" id="login">
+	<div data-role="header" data-theme="b" data-position="fixed">
 		<h1>亲子卷轴</h1>
-	</div><!-- /header -->
+	</div>
+	<div data-role="content" data-theme="b">
+		<input id="id_login" name="id" class="username" type="text" placeholder="账号"/><br/>
+		<input id="password_login" name="password" type="password" class="password" placeholder="密码"/><br/>
+		<a href="#" data-role="button"  data-theme="b" onclick="login();">登陆</a>
+		<a href="#register">返回注册</a>
+	</div>
+</div>
+<!-- 登陆页面结束 -->
+
+<!-- 注册页面开始 -->
+<div data-role="page" id="register">
+	<div data-role="header" data-theme="b" data-position="fixed">
+		<h1>亲子卷轴</h1>
+	</div>
+	<div data-role="content" data-theme="b">
+		<input id="id" name="id" class="username" type="text" placeholder="账号"/><br/>
+		<input id="password" name="password" type="password" class="password" placeholder="密码"/><br/>
+		<input id="passwordConfirm" name="passwordConfirm" type="password" class="password" placeholder="密码确认"/><br/>
+		<input id="name" name="name" type="text" placeholder="呢称"/><br/>
+		<input id="email" type="text" placeholder="邮箱"/><br/>
+		<a href="#" data-role="button"  data-theme="b" onclick="register();">注册</a>
+		<a href="#login">返回登录</a>
+	</div>
+</div>
+<!-- 注册页面结束 -->
+
+<!-- 首页开始 -->
+<div data-role="page" id="main">
+	<div data-role="header" data-theme="b" data-position="fixed">
+		<h1>亲子卷轴</h1>
+	</div>
 
 	<div data-role="content" data-theme="b">	
-		<img style="display:none;width:100;height:100px;" id="photo" src="" /> 
-		<div class="list"></div> 
-		<div id="log"></div>
-	</div><!-- /content -->
-	<div data-role="footer" data-theme="b">
+		<div id="list" class="shareList">
+		</div>
+	</div>
+	<div data-role="footer" data-theme="b" data-position="fixed">
 		<div data-role="navbar">
 			<ul>
-				<li><a href="#" onclick="showList();" class="ui-btn-active">首页</a></li>
-				<li><a href="#">热门</a></li>
-				<li><a href="#" onclick="capturePhoto()">拍照</a></li>
-				<li><a href="#">消息</a></li>
-				<li><a href="#">个人</a></li>
+				<li><a href="#main" onclick="showList();" class="ui-btn-active">首页</a></li>
+				<li><a href="#hot">热门</a></li>
+				<li><a href="#photo">拍照</a></li>
+				<li><a href="#message">消息</a></li>
+				<li><a href="#personal">个人</a></li>
 			</ul>
-		</div><!-- /navbar -->
-	</div><!-- /footer -->
-</div><!-- /page -->
+		</div>
+	</div>
+</div>
+<!-- 首页结束 -->
+
+<!-- 热门开始 -->
+<div data-role="page" id="hot">
+	<div data-role="header" data-theme="b" data-position="fixed">
+		<h1>热门</h1>
+	</div>
+
+	<div data-role="content" data-theme="b">	
+
+	</div>
+	<div data-role="footer" data-theme="b" data-position="fixed">
+		<div data-role="navbar">
+			<ul>
+				<li><a href="#main" onclick="showList();">首页</a></li>
+				<li><a href="#hot" class="ui-btn-active">热门</a></li>
+				<li><a href="#photo">拍照</a></li>
+				<li><a href="#message">消息</a></li>
+				<li><a href="#personal">个人</a></li>
+			</ul>
+		</div>
+	</div>
+</div>
+<!-- 热门结束 -->
+
+<!-- 照片开始 -->
+<div data-role="dialog" id="photo">
+	<div data-role="header" data-theme="b">
+		<h1>请选择</h1>
+	</div>
+	<div data-role="content" data-theme="b">
+		<a href="#" data-role="button" data-rel="dialog" data-transition="slidedown" data-theme="b" onclick="capturePhoto();">照相</a>
+		<a href="#" data-role="button" data-rel="dialog" data-transition="slidedown" data-theme="b" onclick="selectPic();">图片</a> 
+	</div>
+</div>
+<div data-role="page" id="upload">
+	<div data-role="header" data-theme="b" data-position="fixed">
+		<h1>上传照片</h1>
+	</div>
+
+	<div data-role="content" data-theme="b">	
+		<div id="photoDiv">
+			<input id="photoPath" type="text" id="photo" value=""></input><br/>
+			<img id="photoImg" src="" width="100%;" height="300px;"></img><br/>
+			<textarea name="textarea" id="description" ows=3></textarea><br/>
+			<a href="#" data-role="button" onclick="uploadPhoto()">上传</a>		
+		</div>
+	</div>
+	<div data-role="footer" data-theme="b" data-position="fixed">
+		<div data-role="navbar">
+			<ul>
+				<li><a href="#main" onclick="showList();">首页</a></li>
+				<li><a href="#hot">热门</a></li>
+				<li><a href="#photo" class="ui-btn-active">拍照</a></li>
+				<li><a href="#message">消息</a></li>
+				<li><a href="#personal">个人</a></li>
+			</ul>
+		</div>
+	</div>
+</div>
+<!-- 照片结束 -->
+
+<!-- 消息开始 -->
+<div data-role="page" id="message">
+	<div data-role="header" data-theme="b" data-position="fixed">
+		<h1>消息</h1>
+	</div>
+
+	<div data-role="content" data-theme="b">	
+
+	</div>
+	<div data-role="footer" data-theme="b" data-position="fixed">
+		<div data-role="navbar">
+			<ul>
+				<li><a href="#main" onclick="showList();">首页</a></li>
+				<li><a href="#hot">热门</a></li>
+				<li><a href="#photo">拍照</a></li>
+				<li><a href="#message" class="ui-btn-active">消息</a></li>
+				<li><a href="#personal">个人</a></li>
+			</ul>
+		</div>
+	</div>
+</div>
+<!-- 消息结束 -->
+
+<!-- 个人开始 -->
+<div data-role="page" id="personal">
+	<div data-role="header" data-theme="b" data-position="fixed">
+		<h1>消息</h1>
+	</div>
+
+	<div data-role="content" data-theme="b">	
+
+	</div>
+	<div data-role="footer" data-theme="b" data-position="fixed">
+		<div data-role="navbar">
+			<ul>
+				<li><a href="#main" onclick="showList();">首页</a></li>
+				<li><a href="#hot">热门</a></li>
+				<li><a href="#photo">拍照</a></li>
+				<li><a href="#message">消息</a></li>
+				<li><a href="#personal" class="ui-btn-active">个人</a></li>
+			</ul>
+		</div>
+	</div>
+</div>
+<!-- 个人结束 -->
 </body>
 </html>
