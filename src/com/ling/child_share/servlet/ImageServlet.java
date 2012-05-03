@@ -59,12 +59,12 @@ public class ImageServlet extends HttpServlet {
 			response.setCharacterEncoding("UTF-8");
 			PrintWriter writer = response.getWriter();
 			if (userId == null || "".equals(userId)) {
-				writer.write("user id error!");
+				writer.write("getPhotos({ret:-1, msg:'user not exist'});");
 				return;
 			}
 			ResultSet rs = imageDao.getImages(userId);
 			try {
-				String html = "getInfo([";
+				String html = "getPhotos({ret:0, msg:'load success', data:[";
 				while (rs.next()) {
 					html += "{description:'" + rs.getString("description")
 							+ "', path:'" + rs.getString("img_path")
@@ -74,10 +74,12 @@ public class ImageServlet extends HttpServlet {
 						html += ",";
 					}
 				}
-				html += "]);";
+				html += "]});";
 				writer.write(html);
+				return;
 			} catch (SQLException e) {
 				e.printStackTrace();
+				writer.write("getPhotos({ret:-3, msg:'server error'});");
 			}
 		}
 	}
@@ -91,20 +93,21 @@ public class ImageServlet extends HttpServlet {
 		    Iterator itr = items.iterator();
 		    while (itr.hasNext()) {
 		        FileItem item = (FileItem) itr.next();
+		        String name = item.getName();
 		        if (item.isFormField()) {
 //		        	String fieldName = item.getFieldName();
 //		        	String fieldValue = item.getString();
 		        } else {
 		            if (item.getName() != null && !item.getName().equals("")) {
-		            	String userName = "jeffreyzhang";
-		            	String filePath = Constants.PHOTO_PATH + Constants.FILE_SEPARATOR + userName + Constants.FILE_SEPARATOR;
+		            	String userId = request.getParameter("userId");
+		            	String filePath = request.getSession().getServletContext().getRealPath("/") + "pics" + File.separator + userId + File.separator;
 		            	File f = new File(filePath);
 						if (!f.exists()) f.mkdirs();
 		                File file = new File(filePath + item.getName() + ".jpg");
 		                item.write(file);
 		                
 		                Image image = new Image();
-			        	image.setUser(new User("123"));
+			        	image.setUser(new User(userId));
 			        	image.setUpload_time(new Date());
 			        	image.setDescription("");
 			        	image.setImg_path(file.getPath());

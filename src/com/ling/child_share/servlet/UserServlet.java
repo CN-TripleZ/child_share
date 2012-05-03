@@ -60,14 +60,15 @@ public class UserServlet extends HttpServlet {
 			try {
 				if (rs.next()) {
 					String name = rs.getString("name");
-					writer.write("getUserInfo({id:'" + id + "',name:'" + name + "'});");
+					writer.write("getUserInfo({ret:0, msg:'login success', data:{id:'" + id + "',name:'" + name + "'}});");
 					rs.close();
 					return;
 				} else {
-					writer.write("getUserInfo({ret:-1});");
+					writer.write("getUserInfo({ret:-9999, msg:'login fail'});");
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();
+				writer.write("getUserInfo({ret:-1, msg:'server error'});");
 			}
 		}
 	}
