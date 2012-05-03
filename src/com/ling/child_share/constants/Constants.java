@@ -6,7 +6,7 @@ package com.ling.child_share.constants;
  */
 public interface Constants {
 	
-	String PHOTO_PATH = "E:/photo";
+	String PHOTO_PATH_DOMAIN = "http://haiyupeter.gicp.net:8080/";
 	
 	String FILE_SEPARATOR = System.getProperty("file.separator");
 	
