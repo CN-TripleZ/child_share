@@ -25,6 +25,19 @@ public class ImageDao {
 		return null;
 	}
 	
+	public ResultSet getHotImages() {
+		String sql = "select *from t_image order by upload_time desc";
+		DbOperator dbOperator = new DbOperator();
+		PreparedStatement ps = dbOperator.getPreparedStatement(sql);
+		try {
+			ps.execute();
+			return ps.getResultSet();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 	public boolean addImage(Image image) {
 		StringBuffer sql = new StringBuffer();
 		sql.append("insert into t_image (t_user_id, description, upload_time, img_path) ");

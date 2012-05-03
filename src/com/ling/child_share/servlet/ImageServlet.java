@@ -57,7 +57,6 @@ public class ImageServlet extends HttpServlet {
 
 		} else if ("query".equals(cmd)) {
 			String userId = request.getParameter("userId");
-			response.setCharacterEncoding("UTF-8");
 			PrintWriter writer = response.getWriter();
 			if (userId == null || "".equals(userId)) {
 				writer.write("getPhotos({ret:-1, msg:'user not exist'});");
@@ -74,6 +73,37 @@ public class ImageServlet extends HttpServlet {
 					if (!rs.isLast()) {
 						html += ",";
 					}
+				}
+				html += "]});";
+				writer.write(html);
+				return;
+			} catch (SQLException e) {
+				e.printStackTrace();
+				writer.write("getPhotos({ret:-3, msg:'server error'});");
+			}
+		} else if ("hot".equals(cmd)) {
+			PrintWriter writer = response.getWriter();
+			ResultSet rs = imageDao.getHotImages();
+			ArrayList<String> users = new ArrayList<String>();
+			try {
+				String html = "getHotImages({ret:0, msg:'load success', data:[";
+				while (rs.next()) {
+					// TODO: 后续每个用户只显示一个图像，如果有多的，则显示一个框样式 
+					/*
+					String userId = rs.getString("id");
+					if (users.contains(userId)) {
+						continue;
+					}
+					users.add(userId);
+					*/
+					html += "{description:'" + rs.getString("description")
+							+ "', path:'" + rs.getString("img_path")
+							+ "', upload_time:'" + rs.getDate("upload_time")
+							+ "'}";
+					if (!rs.isLast()) {
+						html += ",";
+					}
+					
 				}
 				html += "]});";
 				writer.write(html);
