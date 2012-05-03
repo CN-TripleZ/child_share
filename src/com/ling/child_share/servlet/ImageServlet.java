@@ -85,7 +85,7 @@ public class ImageServlet extends HttpServlet {
 	}
 
 	private List uploadPhoto(HttpServletRequest request) {
-		List result = new ArrayList();
+		List<Image> result = new ArrayList();
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 		ServletFileUpload upload = new ServletFileUpload(factory);
 		try {
@@ -100,17 +100,19 @@ public class ImageServlet extends HttpServlet {
 		        } else {
 		            if (item.getName() != null && !item.getName().equals("")) {
 		            	String userId = request.getParameter("userId");
+		            	String description = request.getParameter("description");
 		            	String filePath = request.getSession().getServletContext().getRealPath("/") + "pics" + File.separator + userId + File.separator;
 		            	File f = new File(filePath);
 						if (!f.exists()) f.mkdirs();
 		                File file = new File(filePath + item.getName() + ".jpg");
+		                String url = Constants.PHOTO_PATH_DOMAIN + "child_share/" + "pics" + File.separator + userId + File.separator + item.getName() + ".jpg";
 		                item.write(file);
 		                
 		                Image image = new Image();
 			        	image.setUser(new User(userId));
 			        	image.setUpload_time(new Date());
-			        	image.setDescription("");
-			        	image.setImg_path(file.getPath());
+			        	image.setDescription(description);
+			        	image.setImg_path(url);
 			        	result.add(image);
 		            }
 		        }
