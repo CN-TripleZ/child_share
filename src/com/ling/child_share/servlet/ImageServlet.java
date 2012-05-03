@@ -3,6 +3,7 @@ package com.ling.child_share.servlet;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLDecoder;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -101,7 +102,7 @@ public class ImageServlet extends HttpServlet {
 		        if (item.isFormField()) {
 		        	
 		        	String fieldName = item.getFieldName();
-		        	String fieldValue = item.getString();
+		        	String fieldValue = URLDecoder.decode(item.getString("UTF-8"),"UTF-8");
 		        	if ("description".equals(fieldName)) {
 		        		description = fieldValue;
 		        	}
