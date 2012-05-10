@@ -16,5 +16,6 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jmagick-1.0.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/slf4j-api-1.6.4.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/slf4j-jdk14-1.6.4.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/javaee.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
