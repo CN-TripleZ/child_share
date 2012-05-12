@@ -20,6 +20,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
+import com.ling.child_share.constants.Constants;
 import com.ling.child_share.db.ImageDao;
 import com.ling.child_share.model.Image;
 import com.ling.child_share.model.User;
@@ -139,7 +140,7 @@ public class ImageServlet extends HttpServlet {
 			html = "{\"ret\":\"0\", \"msg\":'load success', \"data\":[";
 			while (rs.next()) {
 				html += "{\"description\":'" + rs.getString("description")
-						+ "', \"path\":'" + rs.getString("img_path")
+						+ "', \"path\":'" + Constants.PHOTO_PATH_DOMAIN + rs.getString("img_path")
 						+ "', \"upload_time\":'" + rs.getDate("upload_time")
 						+ "'}";
 				if (!rs.isLast()) {
