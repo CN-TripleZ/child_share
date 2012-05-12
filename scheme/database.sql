@@ -1,5 +1,6 @@
 drop database if exists timeshare;
 create database timeshare;
+use timeshare; 
 create table t_user (
 	id varchar(20) primary key,
 	password varchar(256),
