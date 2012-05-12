@@ -20,7 +20,6 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
-import com.ling.child_share.constants.Constants;
 import com.ling.child_share.db.ImageDao;
 import com.ling.child_share.model.Image;
 import com.ling.child_share.model.User;
@@ -60,65 +59,37 @@ public class ImageServlet extends HttpServlet {
 			response.setCharacterEncoding("UTF-8");
 			PrintWriter writer = response.getWriter();
 			if (userId == null || "".equals(userId)) {
-				writer.write("getPhotos({ret:-1, msg:'user not exist'});");
+				writer.write("getPhotos({'ret':'-1', 'msg':'user not exist'});");
 				return;
 			}
 			ResultSet rs = imageDao.getImages(userId);
-			try {
-				String html = "getPhotos({ret:0, msg:'load success', data:[";
-				while (rs.next()) {
-					html += "{description:'" + rs.getString("description")
-							+ "', path:'" + rs.getString("img_path")
-							+ "', upload_time:'" + rs.getDate("upload_time")
-							+ "'}";
-					if (!rs.isLast()) {
-						html += ",";
-					}
-				}
-				html += "]});";
-				writer.write(html);
+			String html = "getPhotos(" + buildjson(rs) + ");";
+			writer.write(html);
+		} else if ("queryjson".equals(cmd)) {
+			String userId = request.getParameter("userId");
+			response.setCharacterEncoding("UTF-8");
+			PrintWriter writer = response.getWriter();
+			if (userId == null || "".equals(userId)) {
+				writer.write("{'ret':'-1', 'msg':'user not exist'};");
 				return;
-			} catch (SQLException e) {
-				e.printStackTrace();
-				writer.write("getPhotos({ret:-3, msg:'server error'});");
 			}
+			ResultSet rs = imageDao.getImages(userId);
+			String html = buildjson(rs);
+			writer.write(html);
 		} else if ("hot".equals(cmd)) {
 			response.setCharacterEncoding("UTF-8");
 			PrintWriter writer = response.getWriter();
 			ResultSet rs = imageDao.getHotImages();
 			ArrayList<String> users = new ArrayList<String>();
-			try {
-				String html = "getHotImages({ret:0, msg:'load success', data:[";
-				while (rs.next()) {
-					// TODO: 后续每个用户只显示一个图像，如果有多的，则显示一个框样式 
-					/*
-					String userId = rs.getString("id");
-					if (users.contains(userId)) {
-						continue;
-					}
-					users.add(userId);
-					*/
-					html += "{description:'" + rs.getString("description")
-							+ "', path:'" + rs.getString("img_path")
-							+ "', upload_time:'" + rs.getDate("upload_time")
-							+ "'}";
-					if (!rs.isLast()) {
-						html += ",";
-					}
-					
-				}
-				html += "]});";
-				writer.write(html);
-				return;
-			} catch (SQLException e) {
-				e.printStackTrace();
-				writer.write("getPhotos({ret:-3, msg:'server error'});");
-			}
+			String html = "getHotImages(" + buildjson(rs) +  ")";
+			writer.write(html);
+			return;
 		}
+		
 	}
 
 	private List uploadPhoto(HttpServletRequest request) {
-		List<Image> result = new ArrayList();
+		List<Image> result = new ArrayList<Image>();
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 		ServletFileUpload upload = new ServletFileUpload(factory);
 		try {
@@ -146,7 +117,7 @@ public class ImageServlet extends HttpServlet {
 	            	File f = new File(filePath);
 					if (!f.exists()) f.mkdirs();
 	                File file = new File(filePath + item.getName() + ".jpg");
-	                url = Constants.PHOTO_PATH_DOMAIN + "child_share/" + "pics" + File.separator + userId + File.separator + item.getName() + ".jpg";
+	                url = "child_share/" + "pics" + File.separator + userId + File.separator + item.getName() + ".jpg";
 	                item.write(file);
 		        }
 		    }
@@ -160,6 +131,26 @@ public class ImageServlet extends HttpServlet {
 		    e.printStackTrace();
 		}
 		return result;
+	}
+	
+	private String buildjson(ResultSet rs) {
+		String html = "";
+		try {
+			html = "{\"ret\":\"0\", \"msg\":'load success', \"data\":[";
+			while (rs.next()) {
+				html += "{\"description\":'" + rs.getString("description")
+						+ "', \"path\":'" + rs.getString("img_path")
+						+ "', \"upload_time\":'" + rs.getDate("upload_time")
+						+ "'}";
+				if (!rs.isLast()) {
+					html += ",";
+				}
+			}
+			html += "]}";
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return html;
 	}
 
 	/**
