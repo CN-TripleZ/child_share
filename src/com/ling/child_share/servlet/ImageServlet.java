@@ -137,11 +137,11 @@ public class ImageServlet extends HttpServlet {
 	private String buildjson(ResultSet rs) {
 		String html = "";
 		try {
-			html = "{\"ret\":\"0\", \"msg\":'load success', \"data\":[";
+			html = "{'ret':'0', 'msg':'load success', 'data':[";
 			while (rs.next()) {
-				html += "{\"description\":'" + rs.getString("description")
-						+ "', \"path\":'" + Constants.PHOTO_PATH_DOMAIN + rs.getString("img_path")
-						+ "', \"upload_time\":'" + rs.getDate("upload_time")
+				html += "{'description':'" + rs.getString("description")
+						+ "', 'path':'" + Constants.PHOTO_PATH_DOMAIN + rs.getString("img_path")
+						+ "', 'upload_time':'" + rs.getDate("upload_time")
 						+ "'}";
 				if (!rs.isLast()) {
 					html += ",";
