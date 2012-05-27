@@ -3,6 +3,7 @@
 <wb-module deploy-name="child_share">
 <wb-resource deploy-path="/" source-path="/WebContent"/>
 <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+<wb-resource deploy-path="/WEB-INF/classes" source-path="/test"/>
 <property name="context-root" value="child_share"/>
 <property name="java-output-path" value="/child_share/build/classes"/>
 </wb-module>
