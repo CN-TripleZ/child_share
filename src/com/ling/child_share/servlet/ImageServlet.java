@@ -118,7 +118,7 @@ public class ImageServlet extends HttpServlet {
 	            	File f = new File(filePath);
 					if (!f.exists()) f.mkdirs();
 	                File file = new File(filePath + item.getName() + ".jpg");
-	                url = "child_share/" + "pics" + File.separator + userId + File.separator + item.getName() + ".jpg";
+	                url = "child_share/" + "pics" + "/" + userId + "/" + item.getName() + ".jpg";
 	                item.write(file);
 		        }
 		    }
