@@ -9,6 +9,7 @@ import net.sf.ehcache.Element;
 /**
  * Ehcache缓存实现
  */
+@SuppressWarnings("rawtypes")
 public class EHCacheImpl implements ICache {
 	private net.sf.ehcache.Cache cache;
 
