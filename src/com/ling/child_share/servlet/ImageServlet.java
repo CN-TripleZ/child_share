@@ -85,6 +85,12 @@ public class ImageServlet extends HttpServlet {
 			String html = "getHotImages(" + buildjson(rs) +  ")";
 			writer.write(html);
 			return;
+		} else if ("hotjson".equals(cmd)) {
+			response.setCharacterEncoding("UTF-8");
+			PrintWriter writer = response.getWriter();
+			ResultSet rs = imageDao.getHotImages();
+			String html = buildjson(rs);
+			writer.write(html);
 		}
 		
 	}
@@ -118,7 +124,7 @@ public class ImageServlet extends HttpServlet {
 	            	File f = new File(filePath);
 					if (!f.exists()) f.mkdirs();
 	                File file = new File(filePath + item.getName() + ".jpg");
-	                url = "child_share/" + "pics" + File.separator + userId + File.separator + item.getName() + ".jpg";
+	                url = "child_share/" + "pics" + "/" + userId + "/" + item.getName() + ".jpg";
 	                item.write(file);
 		        }
 		    }
@@ -140,7 +146,7 @@ public class ImageServlet extends HttpServlet {
 			html = "{'ret':'0', 'msg':'load success', 'data':[";
 			while (rs.next()) {
 				html += "{'description':'" + rs.getString("description")
-						+ "', 'path':'" + Constants.PHOTO_PATH_DOMAIN + rs.getString("img_path")
+						+ "', 'path':'" + rs.getString("img_path")
 						+ "', 'upload_time':'" + rs.getDate("upload_time")
 						+ "'}";
 				if (!rs.isLast()) {
