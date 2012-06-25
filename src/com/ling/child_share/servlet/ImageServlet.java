@@ -146,7 +146,7 @@ public class ImageServlet extends HttpServlet {
 			html = "{'ret':'0', 'msg':'load success', 'data':[";
 			while (rs.next()) {
 				html += "{'description':'" + rs.getString("description")
-						+ "', 'path':'" + rs.getString("img_path")
+						+ "', 'path':'" + Constants.PHOTO_PATH_DOMAIN + rs.getString("img_path")
 						+ "', 'upload_time':'" + rs.getDate("upload_time")
 						+ "'}";
 				if (!rs.isLast()) {
