@@ -1,0 +1,118 @@
+.main-content {
+	position: relative;
+	height: 300px;
+	padding: 0;
+	margin: 0;
+	overflow: hidden;
+	background: #FFF !important;
+}
+.wrapper {
+	position: absolute;
+	z-index: 1;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 230px;
+	overflow: auto;
+}
+.shareList {
+	width: 3300px;
+	height: 100%;
+	float: left;
+	padding: 0;
+}
+.shareList li {
+	float: left;
+	/*width: 270px;*/
+	border: 1px solid #E6E4E1;
+	border-radius: 10px;
+	margin-left: 5px;
+	box-shadow: 0 5px 8px rgba(0, 0, 0, 0.3);
+	position: relative;
+}
+.shareList li:first-child {
+	margin-left: 0;
+}
+.shareList li img {
+	border-radius: 5px;
+	width: 250px;
+	height: 200px;
+	margin: 5px;
+	display: block;
+}
+.shareList li .img-info {
+	width: 100%;
+	margin-bottom: 10px;
+	position: absolute;
+	left: 0;
+	bottom: 3px;
+}
+.shareList .img-info .img-title {
+	display: inline-block;
+	width: 200px;
+	height: 22px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	vertical-align: middle;
+	font-size: 16px;
+	color: #999;
+	text-indent: 1em;
+}
+.shareList .img-info .img-comment {
+	display: inline-block;
+	height: 23px;
+	vertical-align: middle;
+	background-color: #CBCACB;
+	border-radius: 23px;
+}
+.shareList .img-info .img-comment .comment-btn {
+	width: 17px;
+	height: 17px;
+	margin: 3px 0 0 3px;
+	float: left;
+	background: url(images/more.png) no-repeat 0 0;
+}
+.shareList .img-info .img-comment .comment-num {
+	color: #FFF;
+	float: left;
+	line-height: 23px;
+	margin: 0 4px 0 1px;
+	font-size: 12px;
+}
+
+.tml_spine .spine_plus {
+	top: 0;
+	left: 0;
+	position: absolute;
+	width: 15px;
+	height: 15px;
+	background-image: url(images/gray.png);
+	/*background-position: -203px -45px;*/
+}
+
+.tml_spine .spine_date {
+	position: absolute;
+	top: 16px;
+	width: 75px;
+	height: 25px;
+	color: #999;
+	font-weight: normal;
+	font-size: 12px;
+}
+
+.tml_spine .spine_current {
+	background-image: url(images/green.png);
+}
+
+.tml_spine_bg {
+	display: block;
+	/*margin-left: 6px;*/
+	margin-top: 6px;
+	width: 100%;
+	height: 3px;
+	background-color: #dfdfdf;
+	opacity: .5;
+	filter: Alpha(opacity=50);
+}

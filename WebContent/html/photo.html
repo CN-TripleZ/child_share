@@ -1,0 +1,32 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>请选择</title>
+	<link rel="stylesheet" href="../css/jquery.mobile-1.1.0.css" />
+	<script type="text/javascript" src="../js/cordova-1.7.0rc1.js"></script>
+	<script type="text/javascript" src="../js/jquery-1.7.2.js"></script>
+	<script type="text/javascript" src="../js/jquery.mobile-1.1.0.js"></script>
+	<style>
+	/*
+	.ui-page 
+	{
+		-webkit-backface-visibility: hidden;
+	} 
+	*/
+  	</style>
+</head>
+<body>
+	
+<div data-role="dialog">
+	<div data-role="header" data-theme="b">
+		<h1>请选择</h1>
+	</div>
+	<div data-role="content" data-theme="b">
+		<a href="#" data-role="button" data-rel="dialog" data-transition="slidedown" data-theme="b" onclick="capturePhoto();">照相</a>
+		<a href="#" data-role="button" data-rel="dialog" data-transition="slidedown" data-theme="b" onclick="selectPic();">图片</a> 
+	</div>
+</div>
+</body>
+</html>

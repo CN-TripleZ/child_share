@@ -1,1 +1,1 @@
-var webContext = 'http://haiyupeter.gicp.net:8080/child_share';
+var webContext = 'http://192.168.1.160:8080/child_share';

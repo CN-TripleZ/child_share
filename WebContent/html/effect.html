@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Effect</title>
+  <link rel="stylesheet" type="text/css" href="../css/animation.css" >
+  <script charset="utf-8" type="text/javascript"  src="../js/effect.mobile.js"></script>
+</head>
+
+<body>
+<div style="width:100px; height:100px; background:red;"></div>
+<button type="button">click</button>
+<script type="text/javascript">
+
+document.querySelector("button").addEventListener("click", function(e){
+    var animation = E4M.getAnimation("test");
+    animation.set("start", function(){
+        console.info("start....");
+    });
+    animation.set("stop", function(node, newClass, replaceClass){
+        console.info("stop....");
+        E4M.removeClass(node, newClass);
+    });
+    animation.transition("div", "ease-in");
+}, false);
+</script>
+</body>
+</html>

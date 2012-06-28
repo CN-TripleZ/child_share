@@ -1,0 +1,79 @@
+.icon {display:block; width:18px; height:18px; line-height:17px; text-align:center;}
+.ico-plus{-webkit-border-radius:9px; background:black; color:white;}
+
+/*-------------- ������ --------------*/
+@-webkit-keyframes breathing-lights {
+  from {
+    -webkit-box-shadow:0 0 5px #ddd;
+  }
+	50% {
+    -webkit-box-shadow: 0 0 10px #398B08;
+  }
+	to {
+    -webkit-box-shadow:0 0 5px #ddd;
+  }
+}
+
+.breathing-lights{
+  -webkit-animation-name: breathing-lights;
+  -webkit-animation-duration: 3s;
+	-webkit-animation-iteration-count: infinite;
+}
+/*-------------- end --------------*/
+
+@-webkit-keyframes flipInX {
+    0% {
+        -webkit-transform: perspective(400px) rotateX(90deg);
+        opacity: 0;
+    }
+    
+    40% {
+        -webkit-transform: perspective(400px) rotateX(-10deg);
+    }
+    
+    70% {
+        -webkit-transform: perspective(400px) rotateX(10deg);
+    }
+    
+    100% {
+        -webkit-transform: perspective(400px) rotateX(0deg);
+        opacity: 1;
+    }
+}
+
+.flipInX {
+  -webkit-animation-duration: 1s;
+	-webkit-backface-visibility: visible !important;
+	-webkit-animation-name: flipInX;
+}
+
+/*-------------- Slide --------------*/
+.slide-ease{
+  -webkit-transition:left 2s ease 0.3s;
+  position:relative;
+}
+
+.ease-up{
+  -webkit-transition:top 1s ease 2s;
+}
+
+.push-menus{
+  -webkit-transition:width 0.2s ease, right 0.2s ease;
+}
+.push-menus-main{
+  -webkit-transition:margin-left 0.2s ease;
+}
+/*-------------- end --------------*/
+.pulldown{height:20px; overflow:hidden; background:red;}
+.pulldown:hover{    
+  -webkit-transition:height 0.5s ease 0.3s;
+  height:50px;
+}
+
+.pullup{height:30px; overflow:hidden; background:red;}
+.pullup:hover{
+  -webkit-transition:height 0.5s ease 0.3s, top 0.5s ease 0.3s;
+  height:100px;
+  top:-70px;
+  position:relative;
+}

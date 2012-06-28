@@ -1,375 +1,139 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;"/>
 <meta charset="UTF-8">
-<title>亲子卷轴</title>
-	<link rel="stylesheet" href="../css/jquery.mobile-1.1.0.css" />
-	<script type="text/javascript" src="../js/constants.js"></script>
-	<script type="text/javascript" src="../js/cordova-1.7.0rc1.js"></script>
-	<script type="text/javascript" src="../js/jquery-1.7.2.js"></script>
-	<script type="text/javascript" src="../js/jquery.mobile-1.1.0.js"></script>
-	<script type="text/javascript">
-	
-		/**  
-		* cookie管理对象  
-		*/  
-		CookieUtil={   
-		   /**  
-		    * 设置Cookie  
-		    * @param {string} 设置cookie的名称  
-		    * @param {string} 设置cookie的值  
-		    * @param {object} 其他选项{是一个对象作为参数}  
-		    */      
-		   set   :   function(name,value,option){   
-		      var str=name+"="+escape(value);
-		      if(option){   
-		         if(option.expireDays){//过期日期   
-		            var date=new Date();   
-		            var ms=option.expireDays*24*3600*1000;   
-		            date.setTime(date.getTime()+ms);   
-		            str+="; expires="+date.toGMTString();   
-		         }   
-		         if(option.path)str+="; path="+path; //设置访问路径   
-		         if(option.domain)str+="; domain"+domain; //设置访问主机   
-		         if(option.secure)str+="; true"; //设置安全性   
-		      }   
-		      document.cookie=str;   
-		   },   
-		   /**  
-		    * 获取Cookie  
-		    * @param  {string} cookie的名称  
-		    * @return {string} cookie的值  
-		    */      
-		   get   :   function(name){   
-		      var cookieArray=document.cookie.split("; "); //得到分割的cookie名值对   
-		      for(var i=0;i<cookieArray.length;i++){   
-		         var arr=cookieArray[i].split("="); //将名和值分开   
-		         if(arr[0]==name)   
-		            return unescape(arr[1]); //如果是指定的cookie，则返回它的值   
-		      }   
-		      return "";   
-		   },   
-		   /**  
-		    * 删除Cookie  
-		    * @param  {string} 需要删除的cookie名称  
-		    */      
-		   del : function(){   
-		      this.set(name,"",{expireDays:-1}); //将过期时间设置为过去来删除一个cookie   
-		   }   
-		}; 
-	
-		function serverError() {
-			alert("服务器繁忙，请稍后重试");
-		}
-		
-		var pictureSource,destinationType;
-		function init() {
-    		document.addEventListener("deviceready", onDeviceReady, true);
-		}
-		var onDeviceReady = function() {
-			pictureSource=navigator.camera.PictureSourceType;  
-        	destinationType=navigator.camera.DestinationType;  
-		}
-		
-		function getPhotos(result) {
-			if (result.ret === -1) {
-				alert("用户不存在");
-				return;
-			}
-			if (result.ret != 0) {
-				serverError();
-				return;
-			}
-			var listHtml = [];
-			var data = result.data;
-			if (data.length == 0) {
-				$("#list").html("暂时没有数据，上传照片？<a href='#photo'>上传<a>");
-				return;				
-			}
-			for (var i = 0; i < data.length; i++) {
-				var itemHtml = "";
-				var desc = data[i].description;
-				var src = data[i].path;
-				var upload_time = data[i].upload_time;
-				if ( i % 2 == 0) {
-					itemHtml = '<div class="item_even"><ul><li><img src="' + src + '"></img></li><li class="text">' + upload_time + '<br/>' + desc + '</li></ul></div>';
-				} else {
-		    		itemHtml = '<div class="item_odd"><ul><li class="text">' + upload_time + '<br/>' + desc + '</li><li><img src="' + src + '"></img></li></ul></div>';
-				}
-			    listHtml.push(itemHtml);
-			}
-			$("#list").html(listHtml.join(''));
-		}
-		
-		var showList = function() {
-			$("#content div").hide();
-			$("#list").show();
-			var userId = CookieUtil.get("userid");
-			$.getScript(webContext + "/ImageServlet?cmd=query&userId=" + userId).error(function(){
-				$("#list").html("服务器繁忙，请稍后重试！");
-			});
-		}
-		
-		var capturePhoto = function() { 
-			navigator.camera.getPicture(onPhotoURISuccess, onFail, { quality: 50, destinationType: destinationType.FILE_URI });
-		}
-		var selectPic = function() {
-			navigator.camera.getPicture(onPhotoURISuccess, onFail, { quality: 50,  destinationType: destinationType.FILE_URI, sourceType: pictureSource.PHOTOLIBRARY });
-		}		
-		function onPhotoURISuccess(imageURI) {  
-			window.location.hash="#upload";
-    		var photoDiv = $('#photoDiv');  
-			$("#photoPath").val(imageURI);
-			$("#photoImg").attr('src',imageURI);
-		}  
-		var onPhotoDataSuccess = function(imageData) {  
-	        var image = document.getElementById('photo');  
-	        image.style.display = 'block';  
-	        image.src = "data:image/jpeg;base64," + imageData;  
-    	}
-		var onFail = function(message) {
-			console.error("An error has occurred while capture one photo. [ " + message + "]");
-		}  
-        function uploadPhoto(){
-			var imageURI = $("#photoPath").val();
-            var options = new FileUploadOptions();
-            options.fileKey = "file";
-            options.fileName = imageURI.substr(imageURI.lastIndexOf('/') + 1);
-            options.mimeType = "image/jpeg";
-			options.chunkedMode = false;
-            var params = new Object();
-            params.userId = CookieUtil.get('userid');
-            params.description = encodeURIComponent($("#description").val());
-            
-            options.params = params;
-            
-            var ft = new FileTransfer();
-            ft.upload(imageURI, webContext + "/ImageServlet?cmd=add", onPhotoUploadSuccess, onPhotoUploadFail, options);
-        }
-        var onPhotoUploadSuccess = function(r){
-            console.log("Code = " + r.responseCode);
-            console.log("Response = " + r.response);
-            console.log("Sent = " + r.bytesSent);
-        }
-        var onPhotoUploadFail = function(error){
-            console.error("An error has occurred while photo upload. The error code = " + error.code);
-        }
-        
-        
-        var backToLogin = function() {
-			window.location.hash="#login";
-		}
-        var backToRegister = function() {
-			window.location.hash="#register";
-		}
-        // -------------------------------------------------- 登录 --------------------------------------------------
-        function login() {
-        	var params = {};
-    		params["id"] = $("#id_login").val();
-    		params["password"] = $("#password_login").val();
-    		params["cmd"] = "query";
-    		$.ajax({
-    			url: webContext + "/UserServlet",
-    			data: params,
-    			dataType: 'script'
-			}).error(function(data){
-				alert("服务器繁忙!");
-			});
-        }
-        
-        var getUserInfo = function (result) {
-        	if (result.ret == -9999) {
-        		alert('用户名不存在，或者密码错误！');
-        		return;
-        	}
-        	if (result.ret != 0) {
-        		alert('服务器繁忙，请稍后重试！');
-        	}
-        	if (result.ret == 0) {
-        		var id = result.data.id;
-        		var name = result.data.name;
-        		CookieUtil.set('userid', id);
-        		CookieUtil.set('username', name);
-        		$("#main h1").html(name + " - 亲子卷轴");
-        		window.location.hash="#main";
-        		showList();
-        	}
-    	}
-        
-        // -------------------------------------------------- 注册 --------------------------------------------------
-        function register(){
-    		var params = {};
-    		params["id"] = $("#id").val();
-    		params["password"] = $("#password").val();
-    		params["passwordConfirm"] = $("#passwordConfirm").val();
-    		params["cmd"] = "add";
-    		params["name"] = $("#name").val();
-    		$.ajax({
-    			url: webContext + "/UserServlet",
-    			data: params,
-    			type: 'post',
-    			dataType: 'script'
-			});
-    	}
-    	
-    	var addUserInfo = function(data) {
-    		CookieUtil.set('userid', data.id);
-    		CookieUtil.set('username', data.name);
-			window.location.hash="#main";
-    		showList();
-    	};
-    	
-    	//  -------------------------------------------------- 注销 --------------------------------------------------
-    	
-    	function logout(){
-    		CookieUtil.set('userid', '');
-    		CookieUtil.set('username', '');
-    		window.location.hash="#login";
-    	}
-    	
-    	// ------------------------------------------------------   热门   ---------------------------------------------------
-    	function showHotImages() {
-    		$.getScript(webContext + "/ImageServlet?cmd=hot").error(function(){
-	            $("#list").html("服务器繁忙，请稍后重试！");
-	        });
-    	}
-    	function getHotImages(result) {
-	        if (result.ret !== 0) {
-	            alert("服务器繁忙，请稍后重试");
-	        }
-	        var data = result.data;
-	        var html = [];
-	        for (var i = 0; i < data.length; i++) {
-	            var isFirst = false;
-	            if (i === 0) {
-	                html.push('<div class="item first">\
-	                               <img class="first" src="' + data[i].path + '">\
-	                           </div>');
-	            } else {
-	                html.push('<div class="item">\
-	                               <img src="' + data[i].path + '">\
-	                           </div>');
-	            }
-	        }
-	        $("#hot_content").html(html.join(''));
-	    }
-	</script>
-	<style type="text/css">
-	    body {
-	        padding:0px;
-	        margin: 0px;
-	        font-family: "微软雅黑";
-			font-size: 12px;
-	    }
-	    .shareList div {
-	        width: 300px;
-	        height: 210px;
-	    }
-	    .shareList div ul {
-	        width: 300px;
-	        height: 200px;
-	        padding: 0px;
-	        margin-top: 3px;        
-	    }
-	    .shareList div ul li{
-	        list-style-type: none;
-	        float: left;
-	    }
-	    .shareList div ul li.text{
-	        width: 92px;
-	        border-left:4px solid #3ddfdf;
-	        margin-left: 2px;
-	    }
-	    .shareList img {
-	        width: 200px;
-	    }
-	    
-	    #hot .item { float:left; }
-        #hot .item { width:90px; height:90px; margin-right:5px;margin-bottom:5px; } 
-        #hot .item img { width:90px; height:90px; }
-        #hot div.first, #hot .item img.first { width:180px;height:180px; }
-	</style>
-	
+<title>宝宝日记</title>
+<link rel="stylesheet" href="../css/jquery.mobile-1.1.0.css" />
+<link rel="stylesheet" href="../css/common.css" />
+<link rel="stylesheet" href="../css/animation.css" />
+<link rel="stylesheet" href="../css/main.css" />
+<link rel="stylesheet" href="../css/list.css" />
+<style type="text/css">
+	#hot .item { float:left; }
+	#hot .item { width:90px; height:90px; margin-right:5px;margin-bottom:5px; } 
+	#hot .item img { width:90px; height:90px; }
+	#hot div.first, #hot .item img.first { width:180px;height:180px; }
+</style>
 </head>
-<body onload="init();">
-
-<!-- 登陆页面开始 -->
-<div data-role="page" id="login">
-	<div data-role="header" data-theme="b" data-position="fixed">
-		<h1>亲子卷轴</h1>
-	</div>
-	<div data-role="content" data-theme="b">
-		<input id="id_login" type="text" placeholder="账号"/><br/>
-		<input id="password_login" type="password" placeholder="密码"/><br/>
-		<a href="#" data-role="button" data-theme="b" onclick="login();">登陆</a>
-		<a href="#register">注册</a>
-	</div>
+<body >
+<!---------------------------------login begin---------------------------------->
+<div data-role="page" id="login" class="ui-page ui-body-b ui-page-active">
+  <div class="flash">
+    <div class="login child"></div>
+    <div class="login bg" data-style="top" data-dir="1" data-size="460" data-page="1">
+      <div class="login form-panel">
+        <form>
+          <div class="login form">
+            <div><label>账号</label><input id="id_login" name="user" type="text" placeholder="请输入账号..."></div>
+            <div><label>密码</label><input id="password_login" name="password" type="password" placeholder="请输入密码..."><a href="#">?</a></div>
+          </div>
+          <div class="login btn-line">
+            <button type="button" onclick="login()">登录</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
-<!-- 登陆页面结束 -->
-
-<!-- 注册页面开始 -->
-<div data-role="page" id="register">
-	<div data-role="header" data-theme="b" data-position="fixed">
-		<h1>亲子卷轴</h1>
-	</div>
-	<div data-role="content" data-theme="b">
-		<input id="id" type="text" placeholder="账号"/><br/>
-		<input id="password" type="password" placeholder="密码"/><br/>
-		<input id="passwordConfirm" type="password" placeholder="密码确认"/><br/>
-		<input id="name" type="text" placeholder="呢称"/><br/>
-		<input id="email" type="text" placeholder="邮箱"/><br/>
-		<a href="#" data-role="button" data-theme="b" onclick="register();">注册</a>
-		<a href="#login">登录</a>
-	</div>
-</div>
-<!-- 注册页面结束 -->
-
-<!-- 首页开始 -->
+<!---------------------------------login end------------------------------------>
 <div data-role="page" id="main">
-	<div data-role="header" data-theme="b" data-position="fixed">
-		<h1>亲子卷轴</h1>
+	<div data-role="header" data-theme="b" class="ui-bar-bg">
+		<a href="#more" class="ui-btn-top-more" data-transition="slide" style="top:5px;"></a>
+		<h1 style="font-size:18px;">宝宝帮</h1>
+		<a href="#feeds" class="ui-btn-top-feeds" data-transition="slide"  data-back="true" style="top:5px;"></a>
 	</div>
 
-	<div data-role="content" data-theme="b">	
-		<div id="list" class="shareList">
+	<div data-role="content" data-theme="a" style="padding:0px;">
+		<div id="info" class="ui-content-info-bg">
+			<a href="#profile.html" data-inline="true" data-role="button" class="ui-btn-info-profile ui-btn-info-publish-cycle" style="left:20px;top:50px;width:60px;height:60px;border-color:#2A0;"></a>
+			<div class="pub-menus">
+		        <div class="pub-menus-main">
+		          <span class="pub-menus-other">
+		            <a class="ico-photo" href="#photo" onclick="window.location.hash='#photo';"><!--ico-photo--></a>        
+		            <a class="ico-talk" href="#"><!--ico-talk--></a>
+		            <a class="ico-mic" href="#"><!--ico-mic--></a>
+		          </span>
+		          <span class="pub-menus-entry">
+		            <a class="ico-pub" href="#"><!--ico-pub--></a>
+		          </span>
+		        </div>
+	        </div>
+	        
+	        <div class="pub-menus2" style="display:none;">
+		        <div class="pub-menus-main2">
+		          <span class="pub-menus-other2">
+		            <a class="ico-photo" href="#"><!--ico-photo--></a>        
+		            <a class="ico-talk" href="#"><!--ico-talk--></a>
+		            <a class="ico-mic" href="#"><!--ico-mic--></a>
+		          </span>
+		          <span class="pub-menus-entry2">
+		            <a class="ico-pub" href="#"><!--ico-pub--></a>
+		          </span>
+		        </div>
+	        </div>
+		</div>
+		<div id="timeline" class="main-content">
+			<div id="wrapper" class="wrapper">
+				<ul id="list" class="shareList"></ul>
+			</div>
+			<div id="list_scroll" style="width:500px; height:15px;padding-top:220px">
+				<a id="time_line" class="tml_spine" style="position: absolute;width: 500px; height:15px;">
+					<span class="tml_spine_bg"></span>
+					<!-- 
+					<i id="add_event_plus" class="spine_plus spine_current" style="left:0px;"></i>
+					 -->
+				</a>
+			</div>
 		</div>
 	</div>
+	
+	<!--<div class="main-content" data-role="content" data-theme="b">	
+		<div id="wrapper" class="wrapper">
+			<div id="list" class="shareList"></div>
+		</div>
+	</div>-->
+	<!-- 
 	<div data-role="footer" data-theme="b" data-position="fixed">
 		<div data-role="navbar">
-			<ul>
-				<li><a href="#main" onclick="showList();" class="ui-btn-active">首页</a></li>
-				<li><a href="#hot" onclick="showHotImages();">热门</a></li>
-				<li><a href="#photo">拍照</a></li>
-				<!--<li><a href="#message">消息</a></li>-->
-				<li><a href="#personal">个人</a></li>
-			</ul>
+
 		</div>
 	</div>
+	 -->
 </div>
-<!-- 首页结束 -->
 
-<!-- 热门开始 -->
-<div data-role="page" id="hot">
-	<div data-role="header" data-theme="b" data-position="fixed">
-		<h1>热门</h1>
+<div data-role="page" id="more">
+	<div data-role="header" data-theme="b" class="ui-bar-bg">
+		<h1 style="font-size:18px;">更多</h1>
+		<a href="#main" class="ui-btn-top-back" data-transition="slide" data-back="true" style="top:5px;"></a>
 	</div>
-
-	<div id="hot_content" data-role="content" data-theme="b">	
-
-	</div>
-	<div data-role="footer" data-theme="b" data-position="fixed">
-		<div data-role="navbar">
-			<ul>
-				<li><a href="#main" onclick="showList();">首页</a></li>
-				<li><a href="#hot" class="ui-btn-active">热门</a></li>
-				<li><a href="#photo">拍照</a></li>
-				<!--<li><a href="#message">消息</a></li>-->
-				<li><a href="#personal">个人</a></li>
-			</ul>
-		</div>
+	<div data-role="content" data-theme="b" style="padding:0px;">
+		<img style="width:640px;height:415px;" class="ui-content-more-bg" />
 	</div>
 </div>
-<!-- 热门结束 -->
+
+<div data-role="page" id="feeds">
+	<div data-role="header"  data-theme="b" class="ui-bar-bg">		
+		<a href="#main" class="ui-btn-top-back" data-transition="slide" style="top:5px;"></a>
+		<h1 style="font-size:18px;">好友宝宝</h1>
+	</div>
+	<div data-role="content" data-theme="b" style="padding:0px;">
+		<img style="width:640px;height:415px;" class="ui-content-feeds-bg" />
+	</div>
+</div>
+<!--
+<div data-role="page" id="feeds">
+	<div data-role="header"  class="ui-bar-bg">
+		<a href="#main" data-role="button" data-transition="slide"  data-back="true">首页</a>
+		<h1 style="font-size:18px;">好友宝宝</h1>
+	</div>
+	<div data-role="content" data-theme="b">
+		
+	</div>
+</div>
+-->
+
+
 
 <!-- 照片开始 -->
 <div data-role="dialog" id="photo">
@@ -377,83 +141,58 @@
 		<h1>请选择</h1>
 	</div>
 	<div data-role="content" data-theme="b">
-		<a href="#" data-role="button" data-rel="dialog" data-transition="slidedown" data-theme="b" onclick="capturePhoto();">照相</a>
-		<a href="#" data-role="button" data-rel="dialog" data-transition="slidedown" data-theme="b" onclick="selectPic();">图片</a> 
+		<a href="#" data-role="button" data-rel="dialog" data-transition="slidedown" data-theme="b" onclick="PictureUpload.capturePhoto();">照相</a>
+		<a href="#" data-role="button" data-rel="dialog" data-transition="slidedown" data-theme="b" onclick="PictureUpload.selectPic();">图片</a> 
 	</div>
 </div>
 <div data-role="page" id="upload">
+
+	<div data-role="header" data-theme="b" class="ui-bar-bg">
+		<a href="#" onclick="window.location.hash='#photo';" class="ui-btn-top-more" style="top:5px;"></a>
+		<h1 style="font-size:18px;">上传照片</h1>
+		<a href="#" onclick="window.location.hash='#main';"  class="ui-btn-top-feeds" style="top:5px;"></a>
+	</div>
+	<!-- 
 	<div data-role="header" data-theme="b" data-position="fixed">
 		<h1>上传照片</h1>
 	</div>
+	 -->
 
 	<div data-role="content" data-theme="b">	
 		<div id="photoDiv">
-			<input id="photoPath" type="text" id="photo" value=""></input><br/>
+			<input id="photoPath" type="text" id="photo" value="" style="display:none;"></input><br/>
 			<img id="photoImg" src="" width="100%;" height="300px;"></img><br/>
 			<textarea name="textarea" id="description" ows=3></textarea><br/>
 			<a href="#" data-role="button" onclick="uploadPhoto()">上传</a>		
 		</div>
 	</div>
+	<!-- 
 	<div data-role="footer" data-theme="b" data-position="fixed">
 		<div data-role="navbar">
 			<ul>
 				<li><a href="#main" onclick="showList();">首页</a></li>
 				<li><a href="#hot" onclick="showHotImages();">热门</a></li>
 				<li><a href="#photo" class="ui-btn-active">拍照</a></li>
-				<!-- <li><a href="#message">消息</a></li> -->
 				<li><a href="#personal">个人</a></li>
 			</ul>
 		</div>
 	</div>
+	 -->
 </div>
 <!-- 照片结束 -->
 
-<!-- 消息开始 -->
-<!--
-<div data-role="page" id="message">
-	<div data-role="header" data-theme="b" data-position="fixed">
-		<h1>消息</h1>
-	</div>
-
-	<div data-role="content" data-theme="b">	
-
-	</div>
-	<div data-role="footer" data-theme="b" data-position="fixed">
-		<div data-role="navbar">
-			<ul>
-				<li><a href="#main" onclick="showList();">首页</a></li>
-				<li><a href="#hot" onclick="showHotImages();">热门</a></li>
-				<li><a href="#photo">拍照</a></li>
-				<li><a href="#message" class="ui-btn-active">消息</a></li>
-				<li><a href="#personal">个人</a></li>
-			</ul>
-		</div>
-	</div>
-</div>
--->
-<!-- 消息结束 -->
-
-<!-- 个人开始 -->
-<div data-role="page" id="personal">
-	<div data-role="header" data-theme="b" data-position="fixed">
-		<h1>消息</h1>
-	</div>
-
-	<div data-role="content" data-theme="b">	
-		<a href="#" data-role="button" data-theme="b" onclick="logout();">注销</a>
-	</div>
-	<div data-role="footer" data-theme="b" data-position="fixed">
-		<div data-role="navbar">
-			<ul>
-				<li><a href="#main" onclick="showList();">首页</a></li>
-				<li><a href="#hot" onclick="showHotImages();">热门</a></li>
-				<li><a href="#photo">拍照</a></li>
-				<!-- <li><a href="#message">消息</a></li> -->
-				<li><a href="#personal" class="ui-btn-active">个人</a></li>
-			</ul>
-		</div>
-	</div>
-</div>
-<!-- 个人结束 -->
 </body>
+<script type="text/javascript" src="../js/constants.js"></script>
+<script type="text/javascript" src="../js/cordova-1.7.0rc1.js"></script>
+<script type="text/javascript" src="../js/jquery-1.7.2.js"></script>
+<script type="text/javascript" src="../js/jquery.mobile-1.1.0.js"></script>
+<script type="text/javascript" src="../js/animate.js"></script>
+<script type="text/javascript" src="../js/iscroll.js"></script>
+<script type="text/javascript" src="../js/data.js"></script>
+<script type="text/javascript" src="../js/upload.js"></script>
+<script type="text/javascript" src="../js/user.js"></script>
+<script type="text/javascript" src="../js/square.js"></script>
+<script type="text/javascript" src="../js/list.js"></script>
+<script type="text/javascript" src="../js/main.js"></script>
+<script>$(init);</script>
 </html>

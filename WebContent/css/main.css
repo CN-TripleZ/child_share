@@ -1,0 +1,154 @@
+/**
+*author : betawang
+*create time: 2012-06-09
+**/
+
+.ui-bar-bg {height:44px;background-image: url(./images/header-bg.png);}
+
+.ui-btn-top-more {height:28px;width:37px;background-image: url(./images/header-btn-more.png);
+   -moz-border-radius: 0.5em;
+   -webkit-border-radius: 0.5em;
+   border-radius: 0.5em;
+}
+
+.ui-btn-top-back {height:28px;width:44px;background-image: url(./images/back.png);
+   -moz-border-radius: 0.5em;
+   -webkit-border-radius: 0.5em;
+   border-radius: 0.5em;
+}
+
+
+.ui-btn-top-feeds {height:28px;width:37px;background-image: url(./images/header-btn-feeds.png);
+   -moz-border-radius: 0.5em;
+   -webkit-border-radius: 0.5em;
+   border-radius: 0.5em;
+}
+
+.ui-content-info-bg {height:130px;background-repeat: no-repeat;background-image: url(./images/info-bg.png);}
+
+.ui-btn-info-profile {background-repeat: no-repeat;background-image: url(./images/profile.png);
+
+}
+
+.ui-content-more-bg {background-repeat: no-repeat;background-image: url(./images/more-content1.png);}
+
+.ui-content-feeds-bg {background-repeat: no-repeat;background-image: url(./images/feeds-content.png);}
+
+.ui-btn-info-publish {background-repeat: no-repeat;background-image: url(./images/publish.png);}
+
+/*.ui-btn-info-publish-cycle{
+   -moz-border-radius-topleft: 2em;
+   -webkit-border-top-left-radius:2em;
+   border-top-left-radius:2em;
+   -moz-border-radius-topright: 2em;
+   -webkit-border-top-right-radius:2em;
+   border-top-right-radius:2em;
+   
+   -moz-border-radius-bottomleft: 2em;
+   -webkit-border-bottom-left-radius:2em;
+   border-bottom-left-radius:2em;
+   -moz-border-radius-bottomright:2em;
+   -webkit-border-bottom-right-radius: 2em;
+   border-bottom-right-radius: 2em;
+}
+.ui-btn-corner-right {
+   -moz-border-radius-topright: 1em;
+   -webkit-border-top-right-radius:1em;
+   border-top-right-radius:1em;
+   -moz-border-radius-bottomright:1em;
+   -webkit-border-bottom-right-radius: 1em;
+   border-bottom-right-radius: 1em;
+}
+.ui-btn-corner-left {
+   -moz-border-radius-topleft: 1em;
+   -webkit-border-top-left-radius:1em;
+   border-top-left-radius:1em;
+   -moz-border-radius-bottomleft: 1em;
+   -webkit-border-bottom-left-radius:1em;
+   border-bottom-left-radius:1em;
+}
+
+.ui-btn-info-publish-cycle {
+   -moz-border-radius: 2em;
+   -webkit-border-radius: 2em;
+   border-radius: 2em;
+}*/
+.ui-btn-info-publish-cycle {
+   -moz-border-radius: 3em;
+   -webkit-border-radius: 3em;
+   border-radius: 3em;
+}
+
+.pub-menus{  
+  position:absolute;
+  right:10px;
+  top:110px;
+  width:70px; 
+  height:70px;
+  overflow:hidden;    
+  background-color:rgba(0,0,0,0.3);
+  -webkit-border-radius:35px;
+  -webkit-box-shadow: 0 0 5px #fff;
+  -webkit-transform:scale(0.5);
+}
+
+.pub-menus-main{width:320px; height:70px; margin-left:-250px;}
+.pub-menus-entry{display:block; width:70px; height:70px; float:left;}
+.pub-menus-entry.on{
+  background-color:rgba(0,0,0,0.3);
+  -webkit-border-radius:35px;
+}
+.pub-menus-other{display:block; width:250px; height:70px; float:left;}
+.pub-menus a{float:left;}
+.pub-menus .ico-pub{display:block; margin-top:18px; margin-left:18px; width:38px; height:32px;  background:url(./images/ico-pub.png) no-repeat 0 0;}
+.pub-menus .pub-menus-entry.on .ico-pub{display:block; margin-top:18px; margin-left:18px; width:38px; height:32px; background:url(./images/ico-pub-gray.png) no-repeat 0 0;}
+.pub-menus .ico-photo{display:block; margin-top:18px; margin-left:34px; width:38px; height:32px; background:url(./images/ico-photo.png) no-repeat 0 0;}
+.pub-menus .ico-talk{display:block; margin-top:17px; margin-left:36px; width:38px; height:35px; background:url(./images/ico-talk.png) no-repeat 0 0;}
+.pub-menus .ico-mic{display:block; margin-top:17px; margin-left:36px; width:38px; height:35px; background:url(./images/ico-mic.png) no-repeat 0 0;}
+
+
+.pub-menus2{  
+  position:absolute;
+  right:10px;
+  top:110px;
+  width:70px; 
+  height:70px;
+  overflow:hidden;    
+  background-color:rgba(0,0,0,0.3);
+  -webkit-border-radius:35px;
+  -webkit-box-shadow: 0 0 5px #fff;
+  -webkit-transform:scale(0.5);
+}
+
+.pub-menus-main2{width:320px; height:70px; margin-left:-250px;}
+.pub-menus-entry2{display:block; width:70px; height:70px; float:left;}
+.pub-menus-entry2.on{
+  background-color:rgba(0,0,0,0.3);
+  -webkit-border-radius:35px;
+}
+
+.pub-menus-other2{display:block; width:250px; height:70px; float:left;}
+.pub-menus2 a{float:left;}
+.pub-menus2 .ico-pub{display:block; margin-top:18px; margin-left:18px; width:38px; height:32px;  background:url(./images/ico-pub.png) no-repeat 0 0;}
+.pub-menus2 .pub-menus-entry2.on .ico-pub{display:block; margin-top:18px; margin-left:18px; width:38px; height:32px; background:url(./images/ico-pub-gray.png) no-repeat 0 0;}
+.pub-menus2 .ico-photo{display:block; margin-top:18px; margin-left:34px; width:38px; height:32px; background:url(./images/ico-photo.png) no-repeat 0 0;}
+.pub-menus2 .ico-talk{display:block; margin-top:17px; margin-left:36px; width:38px; height:35px; background:url(./images/ico-talk.png) no-repeat 0 0;}
+.pub-menus2 .ico-mic{display:block; margin-top:17px; margin-left:36px; width:38px; height:35px; background:url(./images/ico-mic.png) no-repeat 0 0;}
+ 
+ .flash{position:relative; left:0; top:0;width:320px; height:460px; overflow:hidden;}
+.login{position:absolute; width:320px; left:0;top:0;}
+.login.child{width:100%; height:230px; background:url(./images/flash.png) no-repeat 0 0;}
+.login.bg{top:174px; width:100%; height:460px;; background:url(./images/bg.png) no-repeat 0 0;}
+.login.form{left:52px; top:166px; width:212px; height:62px;  background:url(./images/input.png) no-repeat 0 0;}
+.login.form-panel{opacity:0;}
+.login.form-panel.on{
+  opacity:1;
+  -webkit-transition:opacity 0.5s ease;
+}
+.login.form label{font-family:"Microsoft YaHei"; padding-left:8px; color:gray}
+.login.form ::-webkit-input-placeholder {
+    color:#DDD;
+}
+.login.form input{font-family:"Microsoft YaHei"; display:inline; border:none; background:none; width:150px; height:18px;-webkit-box-shadow:none; box-shadow:none;}
+.login.form div a{position:relative; left:24px; font-size:1.5em; text-decoration:none; color:#666; font-family:"Microsoft YaHei";}
+.login.btn-line{top:232px; width:222px; left:47px;}
